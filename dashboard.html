@@ -13,7 +13,7 @@
     /* Sidebar */
     .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
     .sidebar{background:var(--ink);color:white;padding:2rem 0;display:flex;flex-direction:column;}
-    .sidebar-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--blood-light);padding:0 1.5rem 2rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .sidebar-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--blood-light);padding:0 1.5rem 2rem;border-bottom:1px solid rgba(255,255,255,0.08);text-decoration:none;display:block;}
     .sidebar-menu{padding:1.5rem 0;flex:1;}
     .menu-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.5rem;color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.9rem;transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;}
     .menu-item:hover,.menu-item.active{color:white;background:rgba(255,255,255,0.06);border-left:3px solid var(--blood-light);}
@@ -117,15 +117,18 @@
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <div class="sidebar-logo">🩸 DamuConnect</div>
+      <a href="index.html" class="sidebar-logo">🩸 DamuConnect</a>
       <nav class="sidebar-menu">
-        <a class="menu-item active" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="menu-item active" href="dashboard.html"><span class="icon">📊</span> Dashboard</a>
         <a class="menu-item" href="#"><span class="icon">🩸</span> My Donations</a>
         <a class="menu-item" href="#"><span class="icon">🚨</span> Alerts Inbox</a>
         <a class="menu-item" href="map.html"><span class="icon">🗺️</span> Live Map</a>
-        <a class="menu-item" href="#"><span class="icon">👤</span> My Profile</a>
+        <a class="menu-item" href="register.html"><span class="icon">👤</span> My Profile</a>
         <a class="menu-item" href="#"><span class="icon">⚙️</span> Settings</a>
         <a class="menu-item" href="#"><span class="icon">❓</span> Help</a>
+        <a class="menu-item" href="request.html"><span class="icon">🩸</span> Request Blood</a>
+        <a class="menu-item" href="about.html"><span class="icon">ℹ️</span> About</a>
+        <a class="menu-item" href="admin.html"><span class="icon">⚙️</span> Admin Dashboard</a>
       </nav>
       <div class="sidebar-bottom">
         <div class="availability-toggle">

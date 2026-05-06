@@ -43,6 +43,7 @@ Copy
       font-family: 'Playfair Display', serif;
       font-size: 1.5rem; font-weight: 900;
       color: var(--blood);
+      text-decoration: none;
       display: flex; align-items: center; gap: 0.5rem;
     }
     .logo span { color: var(--ink); }
@@ -295,11 +296,12 @@ Copy
 <body>
  
   <nav>
-    <div class="logo">🩸 <span>Damu</span>Connect</div>
+    <a href="index.html" class="logo">🩸 <span>Damu</span>Connect</a>
     <ul class="nav-links">
-      <li><a href="#">How It Works</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
       <li><a href="map.html">Live Map</a></li>
       <li><a href="request.html">Request Blood</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="about.html">About</a></li>
     </ul>
     <a href="register.html" class="nav-cta">Become a Donor</a>
@@ -354,7 +356,7 @@ Copy
     </div>
   </div>
  
-  <section class="section">
+  <section class="section" id="how-it-works">
     <p class="section-label">How It Works</p>
     <h2 class="section-title">Life-saving in three simple steps</h2>
     <p class="section-sub">From emergency to donation in under 30 minutes — powered by SMS and location matching.</p>
