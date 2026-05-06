@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — DamuConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--blood:#C0392B;--blood-dark:#922B21;--cream:#FDF6EC;--ink:#1A0A00;--ash:#7D6E63;--white:#FFFFFF;--green:#27AE60;--orange:#E67E22;--blue:#2980B9;--bg:#0F0F0F;--surface:#1A1A1A;--border:rgba(255,255,255,0.06);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:rgba(255,255,255,0.88);min-height:100vh;display:grid;grid-template-columns:220px 1fr;}
+
+    /* Sidebar */
+    .sidebar{background:#111;border-right:1px solid var(--border);padding:1.5rem 0;display:flex;flex-direction:column;}
+    .sidebar-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--blood);padding:0 1.25rem 1.5rem;border-bottom:1px solid var(--border);}
+    .sidebar-section{padding:1rem 1.25rem 0.5rem;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+    .nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.65rem 1.25rem;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.875rem;transition:all 0.15s;cursor:pointer;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;}
+    .nav-item:hover,.nav-item.active{color:white;background:rgba(255,255,255,0.05);border-left:2px solid var(--blood);}
+    .nav-item .icon{width:20px;text-align:center;}
+    .sidebar-bottom{margin-top:auto;padding:1.25rem;border-top:1px solid var(--border);}
+    .admin-pill{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);color:#E74C3C;padding:0.4rem 0.75rem;border-radius:3px;font-size:0.78rem;font-weight:700;text-align:center;}
+
+    /* Main */
+    .main{overflow-y:auto;padding:2rem;}
+    .page-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+    .page-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;}
+    .page-title em{color:var(--blood);}
+    .header-actions{display:flex;gap:0.75rem;align-items:center;}
+    .date-range{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:0.5rem 0.9rem;font-size:0.82rem;color:rgba(255,255,255,0.6);font-family:'DM Sans',sans-serif;cursor:pointer;}
+    .export-btn{background:var(--blood);color:white;border:none;border-radius:3px;padding:0.5rem 1rem;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;}
+
+    /* KPI row */
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:1.5rem;}
+    .kpi{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.25rem;position:relative;overflow:hidden;}
+    .kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+    .kpi.red::after{background:var(--blood);}
+    .kpi.green::after{background:var(--green);}
+    .kpi.blue::after{background:var(--blue);}
+    .kpi.orange::after{background:var(--orange);}
+    .kpi.purple::after{background:#8E44AD;}
+    .kpi-label{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;}
+    .kpi-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;line-height:1;}
+    .kpi-delta{font-size:0.75rem;margin-top:0.4rem;}
+    .kpi-delta.up{color:var(--green);}
+    .kpi-delta.down{color:var(--blood);}
+
+    /* Charts grid */
+    .charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
+    .charts-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
+    .chart-panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem;}
+    .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+    .chart-title{font-size:0.875rem;font-weight:600;}
+    .chart-sub{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:0.1rem;}
+    .chart-badge{font-size:0.7rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:2px;background:rgba(39,174,96,0.15);color:var(--green);}
+    .chart-wrap{position:relative;}
+
+    /* Table */
+    .table-panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.5rem;margin-bottom:1.5rem;}
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0.5rem 0.75rem;border-bottom:1px solid var(--border);}
+    td{padding:0.8rem 0.75rem;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.03);}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(255,255,255,0.02);}
+    .status-badge{font-size:0.7rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:2px;text-transform:uppercase;}
+    .status-badge.active{background:rgba(192,57,43,0.2);color:#E74C3C;}
+    .status-badge.fulfilled{background:rgba(39,174,96,0.15);color:var(--green);}
+    .bt-tag{font-family:'Playfair Display',serif;font-size:0.875rem;font-weight:900;color:var(--blood);}
+    .urgency-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:0.4rem;}
+    .urgency-dot.critical{background:var(--blood);}
+    .urgency-dot.urgent{background:var(--orange);}
+
+    /* Leaderboard */
+    .leaderboard{display:flex;flex-direction:column;gap:0.5rem;}
+    .lb-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border-radius:4px;}
+    .lb-rank{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:rgba(255,255,255,0.2);width:24px;text-align:center;}
+    .lb-rank.top{color:var(--blood);}
+    .lb-avatar{width:32px;height:32px;border-radius:50%;background:rgba(192,57,43,0.3);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:var(--blood);}
+    .lb-info{flex:1;}
+    .lb-name{font-size:0.875rem;font-weight:600;}
+    .lb-county{font-size:0.72rem;color:rgba(255,255,255,0.35);}
+    .lb-count{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--blood);}
+
+    /* County bar */
+    .county-list{display:flex;flex-direction:column;gap:0.6rem;}
+    .county-row{display:flex;flex-direction:column;gap:0.25rem;}
+    .county-top{display:flex;justify-content:space-between;font-size:0.8rem;}
+    .county-bar{height:6px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;}
+    .county-fill{height:100%;border-radius:6px;background:var(--blood);}
+
+    @media(max-width:900px){
+      body{grid-template-columns:1fr;}
+      .sidebar{display:none;}
+      .kpi-grid{grid-template-columns:repeat(2,1fr);}
+      .charts-grid{grid-template-columns:1fr;}
+      .charts-grid-3{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">🩸 Admin</div>
+    <div class="sidebar-section">Overview</div>
+    <a class="nav-item active" href="#"><span class="icon">📊</span> Dashboard</a>
+    <a class="nav-item" href="#"><span class="icon">🗺️</span> Live Map</a>
+    <div class="sidebar-section">Management</div>
+    <a class="nav-item" href="#"><span class="icon">👥</span> Donors</a>
+    <a class="nav-item" href="#"><span class="icon">🩸</span> Blood Requests</a>
+    <a class="nav-item" href="#"><span class="icon">🏥</span> Hospitals</a>
+    <a class="nav-item" href="#"><span class="icon">🔗</span> Matches</a>
+    <div class="sidebar-section">Reports</div>
+    <a class="nav-item" href="#"><span class="icon">📈</span> Analytics</a>
+    <a class="nav-item" href="#"><span class="icon">📤</span> Export</a>
+    <div class="sidebar-section">System</div>
+    <a class="nav-item" href="#"><span class="icon">💬</span> SMS Logs</a>
+    <a class="nav-item" href="#"><span class="icon">⚙️</span> Settings</a>
+    <div class="sidebar-bottom">
+      <div class="admin-pill">🔐 Admin Access</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">Platform <em>Overview</em></h1>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);margin-top:0.2rem;">Last updated: just now · Kenya · All Counties</p>
+      </div>
+      <div class="header-actions">
+        <select class="date-range">
+          <option>Last 30 days</option>
+          <option>Last 7 days</option>
+          <option>Last 90 days</option>
+          <option>This year</option>
+        </select>
+        <button class="export-btn">↓ Export CSV</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi red">
+        <div class="kpi-label">Total Donors</div>
+        <div class="kpi-val">12,847</div>
+        <div class="kpi-delta up">↑ +234 this month</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-label">Requests Fulfilled</div>
+        <div class="kpi-val">847</div>
+        <div class="kpi-delta up">↑ +62 this month</div>
+      </div>
+      <div class="kpi blue">
+        <div class="kpi-label">Active Requests</div>
+        <div class="kpi-val">14</div>
+        <div class="kpi-delta up" style="color:var(--orange)">⚠ 5 critical</div>
+      </div>
+      <div class="kpi orange">
+        <div class="kpi-label">SMS Sent This Month</div>
+        <div class="kpi-val">38.4K</div>
+        <div class="kpi-delta up">↑ +12% vs last month</div>
+      </div>
+      <div class="kpi purple">
+        <div class="kpi-label">Avg. Response Time</div>
+        <div class="kpi-val">18m</div>
+        <div class="kpi-delta up">↓ Faster by 4 mins</div>
+      </div>
+    </div>
+
+    <!-- Chart Row 1 -->
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Monthly Donations & Requests</div>
+            <div class="chart-sub">Last 12 months · All Kenya</div>
+          </div>
+          <span class="chart-badge">+18% YoY</span>
+        </div>
+        <div class="chart-wrap"><canvas id="monthlyChart" height="180"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Blood Type Distribution</div>
+            <div class="chart-sub">Registered donors</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="bloodTypeChart" height="180"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Chart Row 2 -->
+    <div class="charts-grid-3">
+      <div class="chart-panel">
+        <div class="chart-header"><div class="chart-title">Requests by Urgency</div></div>
+        <div class="chart-wrap"><canvas id="urgencyChart" height="200"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-header"><div class="chart-title">Donor Availability</div></div>
+        <div class="chart-wrap"><canvas id="availChart" height="200"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-header">
+          <div class="chart-title">Top Counties by Donors</div>
+          <div class="chart-sub">Active registrations</div>
+        </div>
+        <div class="county-list">
+          <div class="county-row"><div class="county-top"><span>Nairobi</span><span style="color:var(--blood);font-weight:700">4,821</span></div><div class="county-bar"><div class="county-fill" style="width:100%"></div></div></div>
+          <div class="county-row"><div class="county-top"><span>Mombasa</span><span style="color:var(--blood);font-weight:700">2,134</span></div><div class="county-bar"><div class="county-fill" style="width:44%"></div></div></div>
+          <div class="county-row"><div class="county-top"><span>Kisumu</span><span style="color:var(--blood);font-weight:700">1,876</span></div><div class="county-bar"><div class="county-fill" style="width:39%"></div></div></div>
+          <div class="county-row"><div class="county-top"><span>Nakuru</span><span style="color:var(--blood);font-weight:700">1,423</span></div><div class="county-bar"><div class="county-fill" style="width:30%"></div></div></div>
+          <div class="county-row"><div class="county-top"><span>Eldoret</span><span style="color:var(--blood);font-weight:700">987</span></div><div class="county-bar"><div class="county-fill" style="width:20%"></div></div></div>
+          <div class="county-row"><div class="county-top"><span>Nyeri</span><span style="color:var(--blood);font-weight:700">652</span></div><div class="county-bar"><div class="county-fill" style="width:14%"></div></div></div>
+          <div class="county-row"><div class="county-top"><span>Other (41)</span><span style="color:var(--blood);font-weight:700">954</span></div><div class="county-bar"><div class="county-fill" style="width:20%"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Requests Table -->
+    <div class="table-panel">
+      <div class="chart-header" style="margin-bottom:1rem;">
+        <div class="chart-title">Active Blood Requests</div>
+        <a href="request.html" style="font-size:0.78rem;color:var(--blood);text-decoration:none;font-weight:600">+ New Request</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Blood Type</th>
+            <th>Hospital</th>
+            <th>County</th>
+            <th>Urgency</th>
+            <th>Units</th>
+            <th>Donors Notified</th>
+            <th>Posted</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="bt-tag">O+</span></td>
+            <td>Kenyatta National Hospital · ICU</td>
+            <td>Nairobi</td>
+            <td><span class="urgency-dot critical"></span>Critical</td>
+            <td>3</td>
+            <td>14</td>
+            <td>8 mins ago</td>
+            <td><span class="status-badge active">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="bt-tag">B−</span></td>
+            <td>Aga Khan Hospital · Surgery</td>
+            <td>Nairobi</td>
+            <td><span class="urgency-dot critical"></span>Critical</td>
+            <td>2</td>
+            <td>7</td>
+            <td>23 mins ago</td>
+            <td><span class="status-badge active">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="bt-tag">A+</span></td>
+            <td>MP Shah Hospital · Maternity</td>
+            <td>Nairobi</td>
+            <td><span class="urgency-dot urgent"></span>Urgent</td>
+            <td>1</td>
+            <td>22</td>
+            <td>1 hr ago</td>
+            <td><span class="status-badge active">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="bt-tag">O−</span></td>
+            <td>Coast General Hospital</td>
+            <td>Mombasa</td>
+            <td><span class="urgency-dot urgent"></span>Urgent</td>
+            <td>4</td>
+            <td>5</td>
+            <td>2 hrs ago</td>
+            <td><span class="status-badge active">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="bt-tag">AB+</span></td>
+            <td>Nairobi Hospital · Theatre 2</td>
+            <td>Nairobi</td>
+            <td><span class="urgency-dot"></span>Planned</td>
+            <td>2</td>
+            <td>31</td>
+            <td>Yesterday</td>
+            <td><span class="status-badge fulfilled">Fulfilled</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="chart-panel">
+      <div class="chart-header">
+        <div class="chart-title">🏅 Top Donors This Month</div>
+        <span class="chart-badge">Updated daily</span>
+      </div>
+      <div class="leaderboard">
+        <div class="lb-item"><div class="lb-rank top">1</div><div class="lb-avatar">BM</div><div class="lb-info"><div class="lb-name">Brian Mwangi</div><div class="lb-county">Nairobi · O+</div></div><div class="lb-count">8</div></div>
+        <div class="lb-item"><div class="lb-rank top">2</div><div class="lb-avatar">AO</div><div class="lb-info"><div class="lb-name">Amina Omondi</div><div class="lb-county">Mombasa · A+</div></div><div class="lb-count">6</div></div>
+        <div class="lb-item"><div class="lb-rank top">3</div><div class="lb-avatar">JK</div><div class="lb-info"><div class="lb-name">James Kamau</div><div class="lb-county">Nairobi · B+</div></div><div class="lb-count">5</div></div>
+        <div class="lb-item"><div class="lb-rank">4</div><div class="lb-avatar">GW</div><div class="lb-info"><div class="lb-name">Grace Wanjiku</div><div class="lb-county">Nairobi · O+</div></div><div class="lb-count">5</div></div>
+        <div class="lb-item"><div class="lb-rank">5</div><div class="lb-avatar">PN</div><div class="lb-info"><div class="lb-name">Peter Njoroge</div><div class="lb-county">Kisumu · AB−</div></div><div class="lb-count">4</div></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const chartDefaults = {
+      color: 'rgba(255,255,255,0.7)',
+      font: { family: "'DM Sans', sans-serif", size: 11 }
+    };
+    Chart.defaults.color = chartDefaults.color;
+    Chart.defaults.font = chartDefaults.font;
+
+    // Monthly chart
+    new Chart(document.getElementById('monthlyChart'), {
+      type:'bar',
+      data:{
+        labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        datasets:[
+          { label:'Donations', data:[52,68,85,71,94,110,102,128,145,133,167,180], backgroundColor:'rgba(192,57,43,0.7)', borderRadius:3 },
+          { label:'Requests', data:[38,45,60,55,72,88,79,95,114,108,132,148], backgroundColor:'rgba(192,57,43,0.2)', borderRadius:3 }
+        ]
+      },
+      options:{
+        plugins:{ legend:{ labels:{ usePointStyle:true, padding:16 } } },
+        scales:{
+          x:{ grid:{ color:'rgba(255,255,255,0.04)' } },
+          y:{ grid:{ color:'rgba(255,255,255,0.04)' }, beginAtZero:true }
+        },
+        responsive:true
+      }
+    });
+
+    // Blood type donut
+    new Chart(document.getElementById('bloodTypeChart'), {
+      type:'doughnut',
+      data:{
+        labels:['O+','A+','B+','AB+','O−','A−','B−','AB−'],
+        datasets:[{ data:[37,34,29,4,3,6,2,1], backgroundColor:['#C0392B','#E74C3C','#922B21','#641E16','#D98880','#F1948A','#CD6155','#A93226'], borderWidth:0, hoverBorderWidth:3, hoverBorderColor:'white' }]
+      },
+      options:{
+        plugins:{ legend:{ position:'right', labels:{ padding:10, boxWidth:12 } } },
+        cutout:'65%',
+        responsive:true
+      }
+    });
+
+    // Urgency chart
+    new Chart(document.getElementById('urgencyChart'), {
+      type:'bar',
+      data:{
+        labels:['Critical','Urgent','Planned'],
+        datasets:[{ data:[127,342,378], backgroundColor:['#C0392B','#E67E22','#27AE60'], borderRadius:4 }]
+      },
+      options:{
+        indexAxis:'y',
+        plugins:{ legend:{display:false} },
+        scales:{ x:{ grid:{ color:'rgba(255,255,255,0.04)' } }, y:{ grid:{display:false} } },
+        responsive:true
+      }
+    });
+
+    // Availability donut
+    new Chart(document.getElementById('availChart'), {
+      type:'doughnut',
+      data:{
+        labels:['Available','Unavailable','On cooldown'],
+        datasets:[{ data:[7840,2120,2887], backgroundColor:['#27AE60','rgba(255,255,255,0.15)','#E67E22'], borderWidth:0 }]
+      },
+      options:{
+        plugins:{ legend:{ position:'bottom', labels:{ padding:10, boxWidth:12 } } },
+        cutout:'70%',
+        responsive:true
+      }
+    });
+  </script>
+</body>
+</html>

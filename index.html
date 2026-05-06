@@ -1,0 +1,445 @@
+Index · HTML
+Copy
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DamuConnect — Blood Donor Matching Kenya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blood: #C0392B;
+      --blood-dark: #922B21;
+      --blood-light: #E74C3C;
+      --cream: #FDF6EC;
+      --ink: #1A0A00;
+      --ash: #7D6E63;
+      --gold: #D4A843;
+      --white: #FFFFFF;
+    }
+ 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+ 
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(253,246,236,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(192,57,43,0.1);
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--blood);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .logo span { color: var(--ink); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--ash);
+      font-size: 0.9rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--blood); }
+    .nav-cta {
+      background: var(--blood); color: white;
+      padding: 0.6rem 1.5rem; border-radius: 2px;
+      text-decoration: none; font-weight: 600; font-size: 0.875rem;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--blood-dark); }
+ 
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 4rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; right: -10%; top: -20%;
+      width: 60vw; height: 120vh;
+      background: radial-gradient(ellipse, rgba(192,57,43,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-text { max-width: 580px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(192,57,43,0.1); color: var(--blood);
+      padding: 0.4rem 1rem; border-radius: 2px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 2rem;
+    }
+    .hero-badge::before { content: '●'; font-size: 0.5rem; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+ 
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 900; line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    h1 em { color: var(--blood); font-style: normal; }
+    .hero-sub {
+      font-size: 1.15rem; color: var(--ash);
+      line-height: 1.7; margin-bottom: 2.5rem; max-width: 460px;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--blood); color: white;
+      padding: 1rem 2rem; text-decoration: none;
+      font-weight: 600; font-size: 1rem; border-radius: 2px;
+      transition: all 0.2s; display: inline-block;
+      box-shadow: 4px 4px 0 var(--blood-dark);
+    }
+    .btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--blood-dark); }
+    .btn-secondary {
+      border: 2px solid var(--ink); color: var(--ink);
+      padding: 1rem 2rem; text-decoration: none;
+      font-weight: 600; font-size: 1rem; border-radius: 2px;
+      transition: all 0.2s; display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--ink); color: white; }
+ 
+    /* Hero visual */
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+      position: relative;
+    }
+    .blood-drop-big {
+      width: 320px; height: 380px;
+      background: linear-gradient(160deg, var(--blood-light), var(--blood-dark));
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      transform: rotate(180deg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      box-shadow: 0 30px 80px rgba(192,57,43,0.35);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: rotate(180deg) translateY(0); }
+      50% { transform: rotate(180deg) translateY(-12px); }
+    }
+    .blood-drop-big .inner {
+      transform: rotate(180deg);
+      text-align: center; color: white;
+    }
+    .blood-drop-big .inner .big-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem; font-weight: 900; line-height: 1;
+    }
+    .blood-drop-big .inner p { font-size: 0.85rem; opacity: 0.85; margin-top: 0.3rem; }
+ 
+    .floating-card {
+      position: absolute; background: white;
+      border-radius: 4px; padding: 0.9rem 1.2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      font-size: 0.82rem; border-left: 3px solid var(--blood);
+    }
+    .card-left { left: 0; top: 20%; animation: floatCard 3s ease-in-out infinite; }
+    .card-right { right: 0; bottom: 25%; animation: floatCard 3.5s ease-in-out infinite reverse; }
+    @keyframes floatCard {
+      0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
+    }
+    .floating-card strong { display: block; color: var(--blood); font-weight: 600; }
+ 
+    /* STATS BAR */
+    .stats-bar {
+      background: var(--ink); color: white;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 3rem 4rem; gap: 2rem;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem; font-weight: 900; color: var(--blood-light);
+    }
+    .stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 0.3rem; }
+ 
+    /* HOW IT WORKS */
+    .section { padding: 6rem 4rem; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--blood); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 900;
+      line-height: 1.15; margin-bottom: 1rem; max-width: 600px;
+    }
+    .section-sub { color: var(--ash); max-width: 480px; line-height: 1.7; margin-bottom: 4rem; }
+ 
+    .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+    }
+    .step {
+      padding: 2.5rem; background: white;
+      border: 1px solid rgba(192,57,43,0.12);
+      border-radius: 4px; position: relative;
+      transition: all 0.3s;
+    }
+    .step:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(192,57,43,0.1); }
+    .step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem; font-weight: 900;
+      color: rgba(192,57,43,0.08); position: absolute;
+      top: 1rem; right: 1.5rem; line-height: 1;
+    }
+    .step-icon {
+      width: 52px; height: 52px; background: rgba(192,57,43,0.1);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .step h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.3rem;
+      font-weight: 700; margin-bottom: 0.75rem;
+    }
+    .step p { color: var(--ash); line-height: 1.7; font-size: 0.9rem; }
+ 
+    /* BLOOD TYPES */
+    .types-section { background: var(--ink); color: white; padding: 5rem 4rem; }
+    .types-section .section-title { color: white; }
+    .types-section .section-sub { color: rgba(255,255,255,0.55); }
+    .blood-types-grid {
+      display: grid; grid-template-columns: repeat(8, 1fr); gap: 1rem;
+    }
+    .blood-type-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px; padding: 1.5rem 1rem; text-align: center;
+      transition: all 0.2s; cursor: default;
+    }
+    .blood-type-card:hover { background: var(--blood); transform: scale(1.05); }
+    .bt-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900; color: var(--blood-light);
+    }
+    .blood-type-card:hover .bt-label { color: white; }
+    .bt-desc { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; }
+ 
+    /* CTA SECTION */
+    .cta-section {
+      padding: 7rem 4rem; text-align: center;
+      background: linear-gradient(135deg, rgba(192,57,43,0.05) 0%, transparent 100%);
+      position: relative;
+    }
+    .cta-section::before {
+      content: '🩸';
+      position: absolute; font-size: 12rem; opacity: 0.04;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .cta-section .section-title { margin: 0 auto 1.5rem; max-width: 700px; text-align: center; }
+    .cta-section .section-sub { margin: 0 auto 3rem; text-align: center; }
+    .cta-actions { display: flex; gap: 1rem; justify-content: center; }
+ 
+    /* TESTIMONIAL */
+    .testimonials { padding: 6rem 4rem; background: white; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; }
+    .testimonial {
+      padding: 2rem; border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 4px; position: relative;
+    }
+    .testimonial::before {
+      content: '"'; font-family: 'Playfair Display', serif;
+      font-size: 5rem; color: var(--blood); opacity: 0.2;
+      position: absolute; top: -1rem; left: 1.5rem; line-height: 1;
+    }
+    .testimonial p { color: var(--ash); line-height: 1.7; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .t-author strong { font-weight: 600; }
+    .t-author span { color: var(--ash); font-size: 0.85rem; }
+ 
+    /* FOOTER */
+    footer {
+      background: var(--ink); color: rgba(255,255,255,0.55);
+      padding: 3rem 4rem; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    footer .logo { color: white; }
+    footer p { font-size: 0.85rem; }
+ 
+    /* ANIMATIONS */
+    [data-reveal] { opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
+    [data-reveal].visible { opacity: 1; transform: translateY(0); }
+ 
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; }
+      .hero-visual { display: none; }
+      .stats-bar { grid-template-columns: repeat(2,1fr); padding: 2rem 1.5rem; }
+      .section { padding: 4rem 1.5rem; }
+      .steps { grid-template-columns: 1fr; }
+      .blood-types-grid { grid-template-columns: repeat(4,1fr); }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .cta-actions { flex-direction: column; align-items: center; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+ 
+  <nav>
+    <div class="logo">🩸 <span>Damu</span>Connect</div>
+    <ul class="nav-links">
+      <li><a href="#">How It Works</a></li>
+      <li><a href="map.html">Live Map</a></li>
+      <li><a href="request.html">Request Blood</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <a href="register.html" class="nav-cta">Become a Donor</a>
+  </nav>
+ 
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-badge">Live in Kenya · Saving Lives Daily</div>
+      <h1>Every Drop<br><em>Saves a Life.</em><br>Be Ready.</h1>
+      <p class="hero-sub">When someone in your area urgently needs blood, we'll reach you within minutes. Register once. Save lives forever.</p>
+      <div class="hero-actions">
+        <a href="register.html" class="btn-primary">Register as Donor</a>
+        <a href="request.html" class="btn-secondary">Post Blood Request</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="blood-drop-big">
+        <div class="inner">
+          <div class="big-num">O+</div>
+          <p>Universal<br>Blood Type</p>
+        </div>
+      </div>
+      <div class="floating-card card-left">
+        <strong>🚨 URGENT — Nairobi</strong>
+        B+ needed · KNH · 2 units<br>
+        <span style="color:#C0392B;font-weight:600">14 donors notified</span>
+      </div>
+      <div class="floating-card card-right">
+        <strong>✅ Fulfilled — Mombasa</strong>
+        A- request met in 22 mins<br>
+        <span style="color:#27AE60;font-weight:600">Life saved</span>
+      </div>
+    </div>
+  </section>
+ 
+  <div class="stats-bar">
+    <div class="stat-item" data-reveal>
+      <div class="stat-num">12,400+</div>
+      <div class="stat-label">Donors Registered</div>
+    </div>
+    <div class="stat-item" data-reveal>
+      <div class="stat-num">847</div>
+      <div class="stat-label">Requests Fulfilled</div>
+    </div>
+    <div class="stat-item" data-reveal>
+      <div class="stat-num">340+</div>
+      <div class="stat-label">Lives Saved</div>
+    </div>
+    <div class="stat-item" data-reveal>
+      <div class="stat-num">18 min</div>
+      <div class="stat-label">Average Response Time</div>
+    </div>
+  </div>
+ 
+  <section class="section">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">Life-saving in three simple steps</h2>
+    <p class="section-sub">From emergency to donation in under 30 minutes — powered by SMS and location matching.</p>
+    <div class="steps">
+      <div class="step" data-reveal>
+        <div class="step-num">01</div>
+        <div class="step-icon">🩸</div>
+        <h3>Donor Registers</h3>
+        <p>Share your blood type, location, and phone. That's all. You're now part of Kenya's life-saving network.</p>
+      </div>
+      <div class="step" data-reveal>
+        <div class="step-num">02</div>
+        <div class="step-icon">🏥</div>
+        <h3>Hospital Posts Request</h3>
+        <p>A doctor posts an emergency — blood type, urgency, hospital location. Takes under 60 seconds.</p>
+      </div>
+      <div class="step" data-reveal>
+        <div class="step-num">03</div>
+        <div class="step-icon">📱</div>
+        <h3>You Get Alerted</h3>
+        <p>If you're nearby and compatible, you receive an SMS or WhatsApp instantly. Show up. Donate. Save a life.</p>
+      </div>
+    </div>
+  </section>
+ 
+  <section class="types-section">
+    <p class="section-label" style="color:rgba(255,255,255,0.5)">Blood Compatibility</p>
+    <h2 class="section-title">All 8 blood types covered</h2>
+    <p class="section-sub">Our algorithm knows exactly who can donate to whom — no errors, no delays.</p>
+    <div class="blood-types-grid">
+      <div class="blood-type-card"><div class="bt-label">A+</div><div class="bt-desc">34% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">A−</div><div class="bt-desc">6% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">B+</div><div class="bt-desc">29% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">B−</div><div class="bt-desc">2% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">AB+</div><div class="bt-desc">4% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">AB−</div><div class="bt-desc">1% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">O+</div><div class="bt-desc">37% of Kenyans</div></div>
+      <div class="blood-type-card"><div class="bt-label">O−</div><div class="bt-desc">Universal Donor</div></div>
+    </div>
+  </section>
+ 
+  <section class="testimonials">
+    <p class="section-label">Stories</p>
+    <h2 class="section-title">Real people. Real lives saved.</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial" data-reveal>
+        <p>My daughter needed blood after an accident. Within 20 minutes, two donors arrived at Kenyatta Hospital. I can't believe this app exists.</p>
+        <div class="t-author"><strong>Grace Wanjiku</strong><br><span>Nairobi, Kenya</span></div>
+      </div>
+      <div class="testimonial" data-reveal>
+        <p>I've donated three times through DamuConnect. The SMS comes, I show up. It's the easiest thing I've ever done that matters this much.</p>
+        <div class="t-author"><strong>Brian Ochieng</strong><br><span>Kisumu, Kenya</span></div>
+      </div>
+      <div class="testimonial" data-reveal>
+        <p>As a hospital administrator, the old way was posting on WhatsApp groups and praying. Now we get matched donors in under 15 minutes.</p>
+        <div class="t-author"><strong>Dr. Amina Hassan</strong><br><span>Coast General Hospital</span></div>
+      </div>
+    </div>
+  </section>
+ 
+  <section class="cta-section">
+    <p class="section-label" style="text-align:center">Join the Network</p>
+    <h2 class="section-title">One registration. A lifetime of impact.</h2>
+    <p class="section-sub">You won't be asked to donate every day. Just when someone nearby needs you — and you're eligible.</p>
+    <div class="cta-actions">
+      <a href="register.html" class="btn-primary">Register as Donor</a>
+      <a href="about.html" class="btn-secondary">Learn More</a>
+    </div>
+  </section>
+ 
+  <footer>
+    <div class="logo">🩸 <span>Damu</span>Connect</div>
+    <p>© 2025 DamuConnect Kenya · Saving lives, one drop at a time</p>
+    <p>Powered by Africa's Talking · KNBTS Partner</p>
+  </footer>
+ 
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 120);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

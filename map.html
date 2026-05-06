@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Map — DamuConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root{--blood:#C0392B;--blood-dark:#922B21;--cream:#FDF6EC;--ink:#1A0A00;--ash:#7D6E63;--green:#27AE60;--orange:#E67E22;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--ink);color:white;height:100vh;display:grid;grid-template-rows:auto 1fr;}
+
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:rgba(26,10,0,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(192,57,43,0.2);z-index:1000;}
+    .logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--blood-light,#E74C3C);text-decoration:none;}
+    .nav-pill{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);color:#E74C3C;padding:0.3rem 0.75rem;border-radius:12px;font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:0.4rem;}
+    .nav-pill::before{content:'●';animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .nav-right{display:flex;align-items:center;gap:1rem;}
+    .nav-back{color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.85rem;}
+    .nav-back:hover{color:white;}
+
+    .map-layout{display:grid;grid-template-columns:320px 1fr;height:100%;}
+
+    /* Sidebar */
+    .map-sidebar{background:#111;border-right:1px solid rgba(255,255,255,0.06);overflow-y:auto;display:flex;flex-direction:column;}
+    .sidebar-header{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .sidebar-header h2{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.25rem;}
+    .sidebar-header p{font-size:0.78rem;color:rgba(255,255,255,0.4);}
+
+    /* Filters */
+    .filters{padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .filter-label{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;}
+    .filter-chips{display:flex;gap:0.4rem;flex-wrap:wrap;}
+    .chip{padding:0.3rem 0.7rem;border-radius:12px;font-size:0.75rem;font-weight:600;cursor:pointer;border:1px solid;transition:all 0.2s;}
+    .chip.critical{border-color:rgba(192,57,43,0.4);color:rgba(192,57,43,0.8);background:rgba(192,57,43,0.08);}
+    .chip.critical.active{background:var(--blood);border-color:var(--blood);color:white;}
+    .chip.urgent{border-color:rgba(230,126,34,0.4);color:rgba(230,126,34,0.8);background:rgba(230,126,34,0.08);}
+    .chip.urgent.active{background:var(--orange);border-color:var(--orange);color:white;}
+    .chip.fulfilled{border-color:rgba(39,174,96,0.4);color:rgba(39,174,96,0.8);background:rgba(39,174,96,0.08);}
+    .chip.fulfilled.active{background:var(--green);border-color:var(--green);color:white;}
+
+    /* Request list */
+    .req-list{flex:1;overflow-y:auto;}
+    .req-item{padding:1.2rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.2s;}
+    .req-item:hover,.req-item.selected{background:rgba(255,255,255,0.04);}
+    .req-item-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.4rem;}
+    .req-type-badge{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;padding:0.25rem 0.5rem;border-radius:3px;background:rgba(192,57,43,0.2);color:#E74C3C;line-height:1;}
+    .req-urgency{font-size:0.7rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:2px;text-transform:uppercase;letter-spacing:0.08em;}
+    .req-urgency.critical{background:rgba(192,57,43,0.2);color:#E74C3C;}
+    .req-urgency.urgent{background:rgba(230,126,34,0.2);color:var(--orange);}
+    .req-urgency.fulfilled{background:rgba(39,174,96,0.2);color:var(--green);}
+    .req-hospital{font-size:0.875rem;font-weight:600;margin-bottom:0.2rem;}
+    .req-meta{font-size:0.75rem;color:rgba(255,255,255,0.4);}
+
+    /* Map */
+    #map{height:100%;z-index:1;}
+
+    /* Custom legend */
+    .map-legend{position:absolute;bottom:2rem;right:2rem;background:rgba(17,17,17,0.9);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:1rem 1.2rem;z-index:1000;}
+    .legend-title{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:0.75rem;}
+    .legend-item{display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-bottom:0.4rem;color:rgba(255,255,255,0.7);}
+    .legend-dot{width:12px;height:12px;border-radius:50%;}
+    .legend-dot.critical{background:#C0392B;}
+    .legend-dot.urgent{background:#E67E22;}
+    .legend-dot.fulfilled{background:#27AE60;}
+    .legend-dot.donor{background:#3498DB;border:2px solid white;}
+
+    /* Stats bar */
+    .stats-overlay{position:absolute;top:1rem;left:340px;right:1rem;display:flex;gap:0.75rem;z-index:1000;}
+    .stat-pill{background:rgba(17,17,17,0.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.5rem 1rem;font-size:0.82rem;display:flex;align-items:center;gap:0.5rem;}
+    .stat-pill strong{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;}
+    .stat-pill.red strong{color:#E74C3C;}
+    .stat-pill.orange strong{color:#E67E22;}
+    .stat-pill.green strong{color:#27AE60;}
+
+    @media(max-width:768px){
+      .map-layout{grid-template-columns:1fr;}
+      .map-sidebar{display:none;}
+      .stats-overlay{left:1rem;}
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">🩸 DamuConnect</a>
+    <div class="nav-pill">LIVE</div>
+    <div class="nav-right">
+      <a href="request.html" style="background:var(--blood);color:white;padding:0.5rem 1rem;border-radius:3px;text-decoration:none;font-size:0.85rem;font-weight:600;">+ Post Request</a>
+      <a href="index.html" class="nav-back">← Home</a>
+    </div>
+  </nav>
+
+  <div class="map-layout">
+    <div class="map-sidebar">
+      <div class="sidebar-header">
+        <h2>Active Blood Requests</h2>
+        <p>Showing requests within 50km · Updated live</p>
+      </div>
+      <div class="filters">
+        <div class="filter-label">Filter by Urgency</div>
+        <div class="filter-chips">
+          <span class="chip critical active" onclick="toggleFilter(this,'critical')">🚨 Critical</span>
+          <span class="chip urgent active" onclick="toggleFilter(this,'urgent')">⚠️ Urgent</span>
+          <span class="chip fulfilled" onclick="toggleFilter(this,'fulfilled')">✅ Fulfilled</span>
+        </div>
+      </div>
+      <div class="req-list" id="reqList"></div>
+    </div>
+
+    <div style="position:relative;flex:1;">
+      <div id="map"></div>
+
+      <div class="stats-overlay">
+        <div class="stat-pill red"><strong id="criticalCount">3</strong> Critical</div>
+        <div class="stat-pill orange"><strong id="urgentCount">5</strong> Urgent</div>
+        <div class="stat-pill green"><strong id="donorCount">47</strong> Donors Nearby</div>
+      </div>
+
+      <div class="map-legend">
+        <div class="legend-title">Map Legend</div>
+        <div class="legend-item"><div class="legend-dot critical"></div> Critical Request</div>
+        <div class="legend-item"><div class="legend-dot urgent"></div> Urgent Request</div>
+        <div class="legend-item"><div class="legend-dot fulfilled"></div> Fulfilled</div>
+        <div class="legend-item"><div class="legend-dot donor"></div> Available Donor</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Sample data
+    const requests = [
+      { id:1, blood_type:'O+', hospital:'Kenyatta National Hospital', ward:'ICU', urgency:'critical', lat:-1.3013, lng:36.8070, units:3, time:'8 mins ago', county:'Nairobi' },
+      { id:2, blood_type:'B-', hospital:'Aga Khan Hospital', ward:'Surgery', urgency:'critical', lat:-1.2672, lng:36.8114, units:2, time:'23 mins ago', county:'Nairobi' },
+      { id:3, blood_type:'A+', hospital:'MP Shah Hospital', ward:'Maternity', urgency:'urgent', lat:-1.2815, lng:36.8219, units:1, time:'1 hr ago', county:'Nairobi' },
+      { id:4, blood_type:'AB+', hospital:'Nairobi Hospital', ward:'Theatre', urgency:'urgent', lat:-1.2989, lng:36.8195, units:4, time:'2 hrs ago', county:'Nairobi' },
+      { id:5, blood_type:'O-', hospital:'Mater Hospital', ward:'Paediatric', urgency:'urgent', lat:-1.3109, lng:36.8445, units:2, time:'3 hrs ago', county:'Nairobi' },
+      { id:6, blood_type:'A-', hospital:'Karen Hospital', ward:'Emergency', urgency:'fulfilled', lat:-1.3226, lng:36.7088, units:2, time:'Yesterday', county:'Nairobi' },
+    ];
+
+    const donors = [
+      { lat:-1.2850, lng:36.8200 }, { lat:-1.2780, lng:36.8150 },
+      { lat:-1.2950, lng:36.8300 }, { lat:-1.3050, lng:36.7900 },
+      { lat:-1.2720, lng:36.8400 }, { lat:-1.2660, lng:36.8250 },
+    ];
+
+    const urgencyColors = { critical:'#C0392B', urgent:'#E67E22', fulfilled:'#27AE60' };
+
+    // Init map
+    const map = L.map('map', { center: [-1.2921, 36.8219], zoom: 12 });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution:'© OpenStreetMap contributors © CARTO', maxZoom:19
+    }).addTo(map);
+
+    // Add request markers
+    const markers = {};
+    requests.forEach(req => {
+      const color = urgencyColors[req.urgency];
+      const icon = L.divIcon({
+        html: `<div style="width:36px;height:36px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;">
+                 <span style="transform:rotate(45deg);font-weight:900;font-size:10px;color:white;font-family:serif">${req.blood_type}</span>
+               </div>`,
+        className:'', iconAnchor:[18,36]
+      });
+      const m = L.marker([req.lat, req.lng], { icon }).addTo(map);
+      m.bindPopup(`
+        <div style="font-family:'DM Sans',sans-serif;min-width:200px">
+          <div style="font-weight:900;font-size:1.2rem;font-family:serif;color:${color}">${req.blood_type}</div>
+          <div style="font-weight:700;margin:0.3rem 0">${req.hospital}</div>
+          <div style="font-size:0.8rem;color:#666">${req.ward} · ${req.units} units needed</div>
+          <div style="margin-top:0.5rem;font-size:0.75rem;background:${color}22;padding:0.25rem 0.5rem;border-radius:2px;display:inline-block;color:${color};font-weight:700;text-transform:uppercase">${req.urgency}</div>
+          <div style="margin-top:0.75rem"><a href="request.html" style="background:${color};color:white;padding:0.4rem 0.75rem;border-radius:2px;text-decoration:none;font-size:0.78rem;font-weight:700">I Can Help →</a></div>
+        </div>
+      `);
+      markers[req.id] = m;
+    });
+
+    // Add donor markers
+    donors.forEach(d => {
+      const icon = L.divIcon({
+        html: `<div style="width:14px;height:14px;background:#3498DB;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>`,
+        className:'', iconAnchor:[7,7]
+      });
+      L.marker([d.lat, d.lng], { icon }).addTo(map);
+    });
+
+    // Populate sidebar
+    function renderList(filter = ['critical','urgent']) {
+      const list = document.getElementById('reqList');
+      list.innerHTML = requests.filter(r => filter.includes(r.urgency)).map(req => `
+        <div class="req-item" onclick="focusRequest(${req.id})">
+          <div class="req-item-top">
+            <div class="req-type-badge">${req.blood_type}</div>
+            <span class="req-urgency ${req.urgency}">${req.urgency}</span>
+          </div>
+          <div class="req-hospital">${req.hospital}</div>
+          <div class="req-meta">${req.units} units · ${req.ward} · ${req.time}</div>
+        </div>
+      `).join('');
+    }
+    renderList();
+
+    function focusRequest(id) {
+      const req = requests.find(r => r.id === id);
+      if (req) { map.setView([req.lat, req.lng], 15); markers[id].openPopup(); }
+    }
+
+    let activeFilters = ['critical','urgent'];
+    function toggleFilter(chip, type) {
+      chip.classList.toggle('active');
+      if (activeFilters.includes(type)) activeFilters = activeFilters.filter(f => f !== type);
+      else activeFilters.push(type);
+      renderList(activeFilters);
+    }
+  </script>
+</body>
+</html>

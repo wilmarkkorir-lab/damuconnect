@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register as Donor — DamuConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blood: #C0392B; --blood-dark: #922B21; --blood-light: #E74C3C;
+      --cream: #FDF6EC; --ink: #1A0A00; --ash: #7D6E63; --white: #FFFFFF;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+
+    /* LEFT PANEL */
+    .left-panel {
+      background: var(--ink); color: white;
+      padding: 4rem 3rem; display: flex; flex-direction: column;
+      justify-content: center; position: relative; overflow: hidden;
+    }
+    .left-panel::before {
+      content: '🩸'; font-size: 20rem; opacity: 0.04;
+      position: absolute; right: -4rem; top: 50%; transform: translateY(-50%);
+    }
+    .back-link {
+      color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 3rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: white; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--blood-light); margin-bottom: 3rem; }
+    .panel-title { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; }
+    .panel-title em { color: var(--blood-light); font-style: normal; }
+    .panel-sub { color: rgba(255,255,255,0.55); line-height: 1.7; font-size: 1rem; margin-bottom: 3rem; }
+    .impact-stats { display: flex; flex-direction: column; gap: 1rem; }
+    .impact-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; background: rgba(255,255,255,0.05); border-radius: 4px; border-left: 3px solid var(--blood); }
+    .impact-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; color: var(--blood-light); min-width: 70px; }
+    .impact-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+
+    /* RIGHT PANEL */
+    .right-panel {
+      padding: 4rem 3rem; display: flex; flex-direction: column;
+      justify-content: center; overflow-y: auto;
+    }
+    .form-header { margin-bottom: 2.5rem; }
+    .form-header h2 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem; }
+    .form-header p { color: var(--ash); font-size: 0.9rem; }
+
+    .form-group { margin-bottom: 1.4rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--ash); }
+    input, select {
+      width: 100%; padding: 0.85rem 1rem;
+      border: 1.5px solid rgba(0,0,0,0.12); border-radius: 3px;
+      background: white; font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--blood); box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
+
+    /* Blood type selector */
+    .blood-type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+    .bt-option { display: none; }
+    .bt-label {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.7rem; border: 1.5px solid rgba(0,0,0,0.12);
+      border-radius: 3px; cursor: pointer; font-weight: 700;
+      font-family: 'Playfair Display', serif; font-size: 1rem;
+      transition: all 0.15s; background: white;
+    }
+    .bt-option:checked + .bt-label {
+      background: var(--blood); color: white; border-color: var(--blood);
+      box-shadow: 3px 3px 0 var(--blood-dark);
+    }
+
+    /* Location */
+    .location-group { display: flex; gap: 0.5rem; }
+    .location-group input { flex: 1; }
+    .locate-btn {
+      padding: 0.85rem 1rem; background: rgba(192,57,43,0.08);
+      border: 1.5px solid rgba(192,57,43,0.3); border-radius: 3px;
+      cursor: pointer; font-size: 1.1rem; transition: all 0.2s;
+      color: var(--blood); font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+    .locate-btn:hover { background: rgba(192,57,43,0.15); }
+
+    /* Availability toggle */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; background: rgba(192,57,43,0.05); border-radius: 4px; }
+    .toggle-row span { font-size: 0.9rem; font-weight: 500; }
+    .toggle { position: relative; width: 48px; height: 26px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background: #ddd; border-radius: 26px; cursor: pointer; transition: 0.3s; }
+    .slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+    .toggle input:checked + .slider { background: var(--blood); }
+    .toggle input:checked + .slider::before { transform: translateX(22px); }
+
+    .consent { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; background: rgba(192,57,43,0.05); border-radius: 4px; margin-bottom: 1.5rem; }
+    .consent input[type=checkbox] { width: auto; margin-top: 2px; accent-color: var(--blood); }
+    .consent label { font-size: 0.83rem; color: var(--ash); text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+    .submit-btn {
+      width: 100%; padding: 1rem; background: var(--blood); color: white;
+      border: none; border-radius: 3px; font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      box-shadow: 4px 4px 0 var(--blood-dark); transition: all 0.2s;
+    }
+    .submit-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--blood-dark); }
+    .submit-btn:active { transform: translate(0,0); box-shadow: 2px 2px 0 var(--blood-dark); }
+
+    .login-link { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--ash); }
+    .login-link a { color: var(--blood); text-decoration: none; font-weight: 600; }
+
+    /* Success state */
+    .success-overlay {
+      display: none; position: fixed; inset: 0; background: white;
+      z-index: 200; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+    }
+    .success-overlay.show { display: flex; }
+    .success-drop { font-size: 6rem; animation: float 2s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .success-overlay h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 1.5rem 0 1rem; }
+    .success-overlay p { color: var(--ash); max-width: 400px; line-height: 1.7; margin-bottom: 2rem; }
+    .success-overlay a { background: var(--blood); color: white; padding: 0.9rem 2rem; text-decoration: none; border-radius: 3px; font-weight: 600; }
+
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .left-panel { padding: 3rem 1.5rem; }
+      .right-panel { padding: 2rem 1.5rem; }
+      .panel-title { font-size: 2rem; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left-panel">
+    <a href="index.html" class="back-link">← Back to Home</a>
+    <div class="logo">🩸 DamuConnect</div>
+    <h1 class="panel-title">Give Blood.<br><em>Give Life.</em><br>Today.</h1>
+    <p class="panel-sub">Join over 12,000 registered donors across Kenya. One registration is all it takes to be someone's hero when they need it most.</p>
+    <div class="impact-stats">
+      <div class="impact-item">
+        <div class="impact-num">340+</div>
+        <div class="impact-label">Lives saved through DamuConnect</div>
+      </div>
+      <div class="impact-item">
+        <div class="impact-num">18 min</div>
+        <div class="impact-label">Average donor response time</div>
+      </div>
+      <div class="impact-item">
+        <div class="impact-num">47</div>
+        <div class="impact-label">Counties covered across Kenya</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="form-header">
+      <h2>Create Your Donor Profile</h2>
+      <p>Fill in your details below. It takes under 2 minutes.</p>
+    </div>
+
+    <div id="regForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="firstName" placeholder="e.g. Grace" required />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="lastName" placeholder="e.g. Wanjiku" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number (for SMS alerts)</label>
+        <input type="tel" id="phone" placeholder="+254 7XX XXX XXX" required />
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="grace@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label>Blood Type</label>
+        <div class="blood-type-grid">
+          <input type="radio" name="bloodType" id="bt-ap" value="A+" class="bt-option" /><label for="bt-ap" class="bt-label">A+</label>
+          <input type="radio" name="bloodType" id="bt-an" value="A-" class="bt-option" /><label for="bt-an" class="bt-label">A−</label>
+          <input type="radio" name="bloodType" id="bt-bp" value="B+" class="bt-option" /><label for="bt-bp" class="bt-label">B+</label>
+          <input type="radio" name="bloodType" id="bt-bn" value="B-" class="bt-option" /><label for="bt-bn" class="bt-label">B−</label>
+          <input type="radio" name="bloodType" id="bt-abp" value="AB+" class="bt-option" /><label for="bt-abp" class="bt-label">AB+</label>
+          <input type="radio" name="bloodType" id="bt-abn" value="AB-" class="bt-option" /><label for="bt-abn" class="bt-label">AB−</label>
+          <input type="radio" name="bloodType" id="bt-op" value="O+" class="bt-option" /><label for="bt-op" class="bt-label">O+</label>
+          <input type="radio" name="bloodType" id="bt-on" value="O-" class="bt-option" /><label for="bt-on" class="bt-label">O−</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Your Location</label>
+        <div class="location-group">
+          <input type="text" id="location" placeholder="Nairobi, Westlands..." />
+          <button class="locate-btn" onclick="getLocation()">📍 Use GPS</button>
+        </div>
+        <input type="hidden" id="lat" />
+        <input type="hidden" id="lng" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>County</label>
+          <select id="county">
+            <option value="">Select County</option>
+            <option>Nairobi</option><option>Mombasa</option><option>Kisumu</option>
+            <option>Nakuru</option><option>Eldoret</option><option>Nyeri</option>
+            <option>Meru</option><option>Kilifi</option><option>Machakos</option>
+            <option>Kakamega</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Last Donation Date (if any)</label>
+          <input type="date" id="lastDonation" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="toggle-row">
+          <span>🟢 Available to donate right now</span>
+          <label class="toggle">
+            <input type="checkbox" id="available" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="consent">
+        <input type="checkbox" id="consent" />
+        <label for="consent">I consent to receive SMS and WhatsApp alerts when my blood type is urgently needed near my location. I understand I can opt out at any time by replying STOP.</label>
+      </div>
+
+      <button class="submit-btn" onclick="registerDonor()">🩸 Register as Donor</button>
+
+      <div class="login-link">Already registered? <a href="dashboard.html">View your dashboard →</a></div>
+    </div>
+  </div>
+
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-drop">🩸</div>
+    <h2>You're now a lifesaver.</h2>
+    <p>Welcome to DamuConnect. You'll receive an SMS confirmation shortly. When someone nearby needs your blood type, we'll reach you immediately.</p>
+    <a href="dashboard.html">View Your Donor Dashboard →</a>
+  </div>
+
+  <script>
+    function getLocation() {
+      if (!navigator.geolocation) return alert('Geolocation not supported');
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('lat').value = pos.coords.latitude;
+        document.getElementById('lng').value = pos.coords.longitude;
+        document.getElementById('location').value = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+      }, () => alert('Could not get location. Please enter manually.'));
+    }
+
+    async function registerDonor() {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const phone = document.getElementById('phone').value;
+      const bloodType = document.querySelector('input[name="bloodType"]:checked')?.value;
+      const consent = document.getElementById('consent').checked;
+
+      if (!firstName || !lastName || !phone || !bloodType) {
+        alert('Please fill in all required fields and select your blood type.');
+        return;
+      }
+      if (!consent) {
+        alert('Please consent to receive SMS alerts to complete registration.');
+        return;
+      }
+
+      const btn = document.querySelector('.submit-btn');
+      btn.textContent = 'Registering...'; btn.disabled = true;
+
+      const payload = {
+        name: `${firstName} ${lastName}`,
+        email: document.getElementById('email').value,
+        phone,
+        blood_type: bloodType,
+        latitude: parseFloat(document.getElementById('lat').value) || -1.2921,
+        longitude: parseFloat(document.getElementById('lng').value) || 36.8219,
+        county: document.getElementById('county').value,
+        last_donation_date: document.getElementById('lastDonation').value || null,
+        is_available: document.getElementById('available').checked,
+      };
+
+      try {
+        const res = await fetch('http://localhost:8000/api/donors/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          document.getElementById('successOverlay').classList.add('show');
+        } else {
+          const err = await res.json();
+          alert('Error: ' + (err.detail || 'Registration failed. Please try again.'));
+          btn.textContent = '🩸 Register as Donor'; btn.disabled = false;
+        }
+      } catch {
+        // Demo mode — show success anyway
+        document.getElementById('successOverlay').classList.add('show');
+      }
+    }
+  </script>
+</body>
+</html>

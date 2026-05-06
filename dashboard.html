@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donor Dashboard — DamuConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{--blood:#C0392B;--blood-dark:#922B21;--blood-light:#E74C3C;--cream:#FDF6EC;--ink:#1A0A00;--ash:#7D6E63;--white:#FFFFFF;--green:#27AE60;--gold:#D4A843;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:#F2EBE0;color:var(--ink);}
+
+    /* Sidebar */
+    .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+    .sidebar{background:var(--ink);color:white;padding:2rem 0;display:flex;flex-direction:column;}
+    .sidebar-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--blood-light);padding:0 1.5rem 2rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .sidebar-menu{padding:1.5rem 0;flex:1;}
+    .menu-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.5rem;color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.9rem;transition:all 0.2s;cursor:pointer;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;}
+    .menu-item:hover,.menu-item.active{color:white;background:rgba(255,255,255,0.06);border-left:3px solid var(--blood-light);}
+    .menu-item .icon{font-size:1.1rem;width:24px;text-align:center;}
+    .sidebar-bottom{padding:1.5rem;border-top:1px solid rgba(255,255,255,0.08);}
+    .availability-toggle{background:rgba(255,255,255,0.05);padding:1rem;border-radius:4px;}
+    .avail-label{font-size:0.78rem;color:rgba(255,255,255,0.55);margin-bottom:0.6rem;}
+    .avail-row{display:flex;align-items:center;justify-content:space-between;}
+    .avail-status{font-size:0.9rem;font-weight:600;}
+    .avail-status.on{color:#2ECC71;}
+    .avail-status.off{color:rgba(255,255,255,0.4);}
+    .toggle{position:relative;width:44px;height:24px;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;inset:0;background:#555;border-radius:24px;cursor:pointer;transition:0.3s;}
+    .slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:white;border-radius:50%;transition:0.3s;}
+    .toggle input:checked+.slider{background:var(--green);}
+    .toggle input:checked+.slider::before{transform:translateX(20px);}
+
+    /* Main */
+    .main{padding:2.5rem;overflow-y:auto;}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+    .greeting h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;}
+    .greeting h1 em{color:var(--blood);}
+    .greeting p{color:var(--ash);margin-top:0.25rem;}
+    .top-actions{display:flex;gap:1rem;}
+    .btn-sm{padding:0.6rem 1.2rem;border-radius:3px;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;}
+    .btn-primary-sm{background:var(--blood);color:white;box-shadow:2px 2px 0 var(--blood-dark);}
+    .btn-outline-sm{background:white;color:var(--ink);border:1.5px solid rgba(0,0,0,0.12);}
+
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-bottom:2rem;}
+    .stat-card{background:white;border-radius:6px;padding:1.5rem;border:1px solid rgba(0,0,0,0.05);}
+    .stat-card.highlight{background:var(--blood);color:white;}
+    .stat-icon{font-size:1.5rem;margin-bottom:0.75rem;}
+    .stat-val{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;line-height:1;}
+    .stat-card.highlight .stat-val{color:white;}
+    .stat-lbl{font-size:0.78rem;color:var(--ash);margin-top:0.3rem;text-transform:uppercase;letter-spacing:0.06em;}
+    .stat-card.highlight .stat-lbl{color:rgba(255,255,255,0.7);}
+    .stat-delta{font-size:0.78rem;color:var(--green);font-weight:600;margin-top:0.5rem;}
+
+    /* Two-column */
+    .two-col{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+    .panel{background:white;border-radius:6px;padding:1.5rem;border:1px solid rgba(0,0,0,0.05);}
+    .panel-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid rgba(0,0,0,0.06);}
+
+    /* Timeline */
+    .timeline{display:flex;flex-direction:column;gap:0;}
+    .tl-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+    .tl-item:last-child{border-bottom:none;}
+    .tl-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;margin-top:2px;}
+    .tl-dot.donated{background:rgba(39,174,96,0.12);color:var(--green);}
+    .tl-dot.alerted{background:rgba(192,57,43,0.1);color:var(--blood);}
+    .tl-dot.eligible{background:rgba(212,168,67,0.15);color:var(--gold);}
+    .tl-text strong{display:block;font-size:0.9rem;font-weight:600;}
+    .tl-text span{font-size:0.8rem;color:var(--ash);}
+    .tl-badge{margin-left:auto;font-size:0.72rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:2px;align-self:center;white-space:nowrap;}
+    .badge-green{background:rgba(39,174,96,0.1);color:var(--green);}
+    .badge-red{background:rgba(192,57,43,0.1);color:var(--blood);}
+    .badge-gold{background:rgba(212,168,67,0.15);color:#A07A1A;}
+
+    /* Impact */
+    .impact-visual{text-align:center;padding:1rem 0;}
+    .impact-drop{font-size:4rem;display:block;margin-bottom:0.5rem;}
+    .impact-lives{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:var(--blood);}
+    .impact-label{font-size:0.85rem;color:var(--ash);margin-bottom:1.5rem;}
+    .impact-breakdown{display:flex;flex-direction:column;gap:0.6rem;}
+    .ib-row{display:flex;justify-content:space-between;font-size:0.85rem;padding:0.5rem;background:rgba(192,57,43,0.04);border-radius:3px;}
+    .ib-label{color:var(--ash);}
+    .ib-val{font-weight:700;}
+
+    /* Next donation */
+    .next-donation{background:var(--ink);color:white;border-radius:6px;padding:1.5rem;margin-bottom:2rem;}
+    .next-donation .nd-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:1rem;color:rgba(255,255,255,0.7);}
+    .nd-date{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--blood-light);margin-bottom:0.5rem;}
+    .nd-sub{font-size:0.85rem;color:rgba(255,255,255,0.5);}
+    .nd-progress{margin-top:1rem;}
+    .nd-progress-bar{height:6px;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;margin-top:0.4rem;}
+    .nd-fill{height:100%;background:var(--blood);border-radius:6px;width:78%;}
+    .nd-progress-label{font-size:0.75rem;color:rgba(255,255,255,0.45);margin-top:0.3rem;}
+
+    /* Alerts inbox */
+    .alert-list{display:flex;flex-direction:column;gap:0.75rem;}
+    .alert-item{padding:1rem 1.2rem;border-radius:4px;border-left:4px solid;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+    .alert-item.critical{background:rgba(192,57,43,0.06);border-color:var(--blood);}
+    .alert-item.urgent{background:rgba(230,126,34,0.06);border-color:var(--urgent,#E67E22);}
+    .alert-item.fulfilled{background:rgba(39,174,96,0.06);border-color:var(--green);}
+    .alert-left strong{display:block;font-size:0.9rem;font-weight:600;margin-bottom:0.2rem;}
+    .alert-left span{font-size:0.8rem;color:var(--ash);}
+    .alert-action{font-size:0.78rem;font-weight:600;padding:0.35rem 0.75rem;border-radius:2px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
+    .alert-action.respond{background:var(--blood);color:white;}
+    .alert-action.fulfilled{background:rgba(39,174,96,0.15);color:var(--green);}
+
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr;}
+      .sidebar{display:none;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+      .two-col{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">🩸 DamuConnect</div>
+      <nav class="sidebar-menu">
+        <a class="menu-item active" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="menu-item" href="#"><span class="icon">🩸</span> My Donations</a>
+        <a class="menu-item" href="#"><span class="icon">🚨</span> Alerts Inbox</a>
+        <a class="menu-item" href="map.html"><span class="icon">🗺️</span> Live Map</a>
+        <a class="menu-item" href="#"><span class="icon">👤</span> My Profile</a>
+        <a class="menu-item" href="#"><span class="icon">⚙️</span> Settings</a>
+        <a class="menu-item" href="#"><span class="icon">❓</span> Help</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="availability-toggle">
+          <div class="avail-label">YOUR AVAILABILITY</div>
+          <div class="avail-row">
+            <span class="avail-status on" id="availStatus">🟢 Available</span>
+            <label class="toggle">
+              <input type="checkbox" id="availToggle" checked onchange="toggleAvail(this)" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="top-bar">
+        <div class="greeting">
+          <h1>Hello, <em>Grace</em> 👋</h1>
+          <p>Blood type: <strong>O+</strong> · Nairobi, Westlands</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn-sm btn-outline-sm" onclick="window.location.href='register.html'">Edit Profile</button>
+          <button class="btn-sm btn-primary-sm">📞 Emergency Hotline</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-icon">🩸</div>
+          <div class="stat-val">7</div>
+          <div class="stat-lbl">Total Donations</div>
+          <div class="stat-delta" style="color:rgba(255,255,255,0.7)">+1 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">❤️</div>
+          <div class="stat-val">21</div>
+          <div class="stat-lbl">Lives Saved (est.)</div>
+          <div class="stat-delta">↑ 3 this quarter</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📱</div>
+          <div class="stat-val">12</div>
+          <div class="stat-lbl">Alerts Received</div>
+          <div class="stat-delta" style="color:var(--ash)">3 responded</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-val">Mar 12</div>
+          <div class="stat-lbl">Next Eligible Date</div>
+          <div class="stat-delta">In 36 days</div>
+        </div>
+      </div>
+
+      <!-- Next Donation Countdown -->
+      <div class="next-donation">
+        <div class="nd-title">NEXT ELIGIBLE TO DONATE</div>
+        <div class="nd-date">March 12, 2026</div>
+        <div class="nd-sub">You last donated on December 12, 2024 · 90 days required between donations</div>
+        <div class="nd-progress">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:rgba(255,255,255,0.4);">
+            <span>Dec 12</span><span>Mar 12</span>
+          </div>
+          <div class="nd-progress-bar"><div class="nd-fill"></div></div>
+          <div class="nd-progress-label">78% of recovery period complete · 36 days to go</div>
+        </div>
+      </div>
+
+      <!-- Timeline + Impact -->
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title">📋 Recent Activity</div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot donated">🩸</div>
+              <div class="tl-text">
+                <strong>Donated at KNH Blood Bank</strong>
+                <span>Dec 12, 2024 · Nairobi · B+ request fulfilled</span>
+              </div>
+              <span class="tl-badge badge-green">Donated</span>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot alerted">🚨</div>
+              <div class="tl-text">
+                <strong>Alert: O+ needed at Aga Khan Hospital</strong>
+                <span>Nov 30, 2024 · 2.1km away · Critical</span>
+              </div>
+              <span class="tl-badge badge-red">Alerted</span>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot donated">🩸</div>
+              <div class="tl-text">
+                <strong>Donated at Nairobi Hospital</strong>
+                <span>Sep 14, 2024 · Nairobi</span>
+              </div>
+              <span class="tl-badge badge-green">Donated</span>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot eligible">⭐</div>
+              <div class="tl-text">
+                <strong>Became eligible to donate again</strong>
+                <span>Sep 1, 2024 · 90-day period completed</span>
+              </div>
+              <span class="tl-badge badge-gold">Eligible</span>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot donated">🩸</div>
+              <div class="tl-text">
+                <strong>Donated at Kenyatta National Hospital</strong>
+                <span>Jun 3, 2024 · Emergency request</span>
+              </div>
+              <span class="tl-badge badge-green">Donated</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom:1.5rem;">
+            <div class="panel-title">❤️ Your Impact</div>
+            <div class="impact-visual">
+              <span class="impact-drop">🩸</span>
+              <div class="impact-lives">21</div>
+              <div class="impact-label">estimated lives touched</div>
+            </div>
+            <div class="impact-breakdown">
+              <div class="ib-row"><span class="ib-label">Total units donated</span><span class="ib-val">7</span></div>
+              <div class="ib-row"><span class="ib-label">Requests responded</span><span class="ib-val">3 / 12</span></div>
+              <div class="ib-row"><span class="ib-label">Hospitals helped</span><span class="ib-val">4</span></div>
+              <div class="ib-row"><span class="ib-label">Donor ranking</span><span class="ib-val" style="color:var(--blood)">Top 5%</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">🏅 Achievements</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;">
+                <span style="font-size:1.5rem;">🥇</span>
+                <div><strong style="display:block">First Responder</strong><span style="font-size:0.78rem;color:var(--ash)">Donated within 30 min of alert</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;">
+                <span style="font-size:1.5rem;">💎</span>
+                <div><strong style="display:block">5-Time Hero</strong><span style="font-size:0.78rem;color:var(--ash)">Donated 5+ times on platform</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;opacity:0.4;">
+                <span style="font-size:1.5rem;">🔟</span>
+                <div><strong style="display:block">Ten Lives</strong><span style="font-size:0.78rem;color:var(--ash)">Donate 10 times to unlock</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert Inbox -->
+      <div class="panel">
+        <div class="panel-title">🚨 Recent Blood Alerts (Your Area)</div>
+        <div class="alert-list">
+          <div class="alert-item critical">
+            <div class="alert-left">
+              <strong>🚨 O+ needed — Kenyatta National Hospital</strong>
+              <span>3 units · ICU · 1.4km away · Posted 8 mins ago</span>
+            </div>
+            <button class="alert-action respond">Respond</button>
+          </div>
+          <div class="alert-item urgent">
+            <div class="alert-left">
+              <strong>⚠️ O+ needed — Nairobi West Hospital</strong>
+              <span>2 units · Maternity Ward · 3.2km away · Posted 2 hrs ago</span>
+            </div>
+            <button class="alert-action respond">Respond</button>
+          </div>
+          <div class="alert-item fulfilled">
+            <div class="alert-left">
+              <strong>✅ O+ needed — MP Shah Hospital</strong>
+              <span>Fulfilled · 1 unit · 5.8km away · Yesterday</span>
+            </div>
+            <button class="alert-action fulfilled" disabled>Fulfilled</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleAvail(checkbox) {
+      const status = document.getElementById('availStatus');
+      status.textContent = checkbox.checked ? '🟢 Available' : '⚫ Unavailable';
+      status.className = 'avail-status ' + (checkbox.checked ? 'on' : 'off');
+    }
+  </script>
+</body>
+</html>

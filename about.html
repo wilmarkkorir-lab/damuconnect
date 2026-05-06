@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — DamuConnect</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--blood:#C0392B;--blood-dark:#922B21;--blood-light:#E74C3C;--cream:#FDF6EC;--ink:#1A0A00;--ash:#7D6E63;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(253,246,236,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(192,57,43,0.1);position:sticky;top:0;z-index:50;}
+    .logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--blood);text-decoration:none;}
+    .nav-links{display:flex;gap:2rem;list-style:none;}
+    .nav-links a{text-decoration:none;color:var(--ash);font-size:0.9rem;font-weight:500;}
+    .nav-links a:hover{color:var(--blood);}
+    .nav-cta{background:var(--blood);color:white;padding:0.6rem 1.5rem;border-radius:2px;text-decoration:none;font-weight:600;font-size:0.875rem;}
+
+    .hero{background:var(--ink);color:white;padding:6rem 4rem;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'🩸';font-size:20rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.03;pointer-events:none;}
+    .hero h1{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;margin-bottom:1rem;}
+    .hero h1 em{color:var(--blood-light);font-style:normal;}
+    .hero p{font-size:1.1rem;color:rgba(255,255,255,0.55);max-width:600px;margin:0 auto;line-height:1.7;}
+
+    .section{padding:5rem 4rem;}
+    .mission{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+    .mission-text h2{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;margin-bottom:1rem;line-height:1.2;}
+    .mission-text h2 em{color:var(--blood);font-style:normal;}
+    .mission-text p{color:var(--ash);line-height:1.8;margin-bottom:1rem;}
+    .mission-visual{background:var(--ink);color:white;padding:3rem;border-radius:6px;text-align:center;}
+    .mission-visual .big-stat{font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;color:var(--blood-light);}
+    .mission-visual p{color:rgba(255,255,255,0.55);margin-top:0.5rem;}
+
+    .problem-section{background:var(--ink);color:white;padding:5rem 4rem;}
+    .problem-section h2{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;text-align:center;margin-bottom:3rem;}
+    .problem-section h2 em{color:var(--blood-light);font-style:normal;}
+    .problems-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;}
+    .problem-card{background:rgba(255,255,255,0.05);padding:2rem;border-radius:4px;border-left:3px solid var(--blood);}
+    .problem-card h3{font-weight:700;margin-bottom:0.75rem;}
+    .problem-card p{color:rgba(255,255,255,0.55);font-size:0.9rem;line-height:1.7;}
+
+    .team-section{padding:5rem 4rem;background:white;}
+    .team-section h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-bottom:0.5rem;}
+    .section-sub{color:var(--ash);margin-bottom:3rem;}
+    .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;}
+    .team-card{padding:1.5rem;border:1px solid rgba(0,0,0,0.07);border-radius:4px;text-align:center;}
+    .team-avatar{width:64px;height:64px;border-radius:50%;background:rgba(192,57,43,0.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem;}
+    .team-name{font-weight:700;margin-bottom:0.25rem;}
+    .team-role{font-size:0.82rem;color:var(--ash);}
+
+    .partners{padding:4rem;background:var(--cream);text-align:center;}
+    .partners h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:2rem;color:var(--ash);}
+    .partner-logos{display:flex;gap:3rem;justify-content:center;flex-wrap:wrap;align-items:center;}
+    .partner-logo{background:white;padding:1rem 2rem;border-radius:4px;border:1px solid rgba(0,0,0,0.08);font-weight:700;font-size:0.9rem;color:var(--ink);}
+
+    .contact-section{background:var(--blood);color:white;padding:5rem 4rem;text-align:center;}
+    .contact-section h2{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;margin-bottom:1rem;}
+    .contact-section p{opacity:0.8;margin-bottom:2rem;}
+    .contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;max-width:700px;margin:0 auto;}
+    .contact-item{background:rgba(255,255,255,0.1);padding:1.5rem;border-radius:4px;}
+    .contact-item .ci-icon{font-size:1.5rem;margin-bottom:0.5rem;}
+    .contact-item strong{display:block;margin-bottom:0.25rem;}
+    .contact-item a{color:rgba(255,255,255,0.8);text-decoration:none;font-size:0.875rem;}
+
+    footer{background:var(--ink);color:rgba(255,255,255,0.4);padding:2rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+    footer .logo{color:white;}
+
+    @media(max-width:768px){
+      nav{padding:1rem 1.5rem;}
+      .nav-links{display:none;}
+      .hero,.section,.problem-section,.team-section,.partners,.contact-section{padding:3rem 1.5rem;}
+      .hero h1{font-size:2.2rem;}
+      .mission{grid-template-columns:1fr;}
+      .problems-grid{grid-template-columns:1fr;}
+      .team-grid{grid-template-columns:repeat(2,1fr);}
+      .contact-grid{grid-template-columns:1fr;}
+      footer{flex-direction:column;gap:1rem;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">🩸 DamuConnect</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="map.html">Live Map</a></li>
+      <li><a href="request.html">Request Blood</a></li>
+      <li><a href="#" style="color:var(--blood)">About</a></li>
+    </ul>
+    <a href="register.html" class="nav-cta">Donate Blood</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Built for <em>Kenya.</em><br>Built to Save Lives.</h1>
+    <p>DamuConnect is a technology platform connecting blood donors with patients in need — making the process fast, location-aware, and accessible to all Kenyans.</p>
+  </div>
+
+  <section class="section">
+    <div class="mission">
+      <div class="mission-text">
+        <h2>Our <em>Mission</em></h2>
+        <p>Kenya needs approximately 500,000 units of blood every year, but collects far less. The gap between donors and patients is not one of willingness — it is one of connection and communication.</p>
+        <p>DamuConnect exists to close that gap. We use SMS technology, location matching, and a simple, fast interface to connect people who want to donate with people who desperately need blood — right now, in their city.</p>
+        <p>We work with hospitals, clinics, and community health workers across all 47 counties to make blood accessible when and where it's needed most.</p>
+      </div>
+      <div class="mission-visual">
+        <div class="big-stat">500K</div>
+        <p>units of blood needed in Kenya every year</p>
+        <div style="margin-top:2rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);">
+          <div class="big-stat" style="font-size:3rem">340+</div>
+          <p>lives saved through DamuConnect so far</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="problem-section">
+    <h2>The Problems We <em>Solve</em></h2>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <h3>🏥 Hospital Blood Shortages</h3>
+        <p>Public hospitals like KNH face daily shortages. Patients in surgery, childbirth, and emergency care wait hours or die for lack of a matching donor nearby.</p>
+      </div>
+      <div class="problem-card">
+        <h3>📢 Inefficient Communication</h3>
+        <p>Families post desperate pleas on Facebook and WhatsApp groups. This reaches few people and takes too long. DamuConnect reaches the right donors instantly.</p>
+      </div>
+      <div class="problem-card">
+        <h3>🗺️ Geography Barriers</h3>
+        <p>Even when donors exist, they don't know where to go. Our location-matching algorithm finds donors within 10km of the hospital in seconds.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <h2>The Team</h2>
+    <p class="section-sub">Built by Kenyans, for Kenya</p>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">👩‍💻</div>
+        <div class="team-name">Grace Kamau</div>
+        <div class="team-role">Lead Developer</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">👨‍⚕️</div>
+        <div class="team-name">Dr. Ali Hassan</div>
+        <div class="team-role">Medical Advisor</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">👩‍🎨</div>
+        <div class="team-name">Amina Ochieng</div>
+        <div class="team-role">Product Design</div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">👨‍💼</div>
+        <div class="team-name">James Njogu</div>
+        <div class="team-role">Partnerships</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="partners">
+    <h2>Our Partners</h2>
+    <div class="partner-logos">
+      <div class="partner-logo">🩸 KNBTS</div>
+      <div class="partner-logo">🔴 Kenya Red Cross</div>
+      <div class="partner-logo">📱 Africa's Talking</div>
+      <div class="partner-logo">🏥 Kenyatta Hospital</div>
+      <div class="partner-logo">🏛️ Ministry of Health</div>
+    </div>
+  </div>
+
+  <section class="contact-section">
+    <h2>Get In Touch</h2>
+    <p>For partnership inquiries, hospital onboarding, or press</p>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="ci-icon">📧</div>
+        <strong>Email</strong>
+        <a href="mailto:hello@damuconnect.co.ke">hello@damuconnect.co.ke</a>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon">📞</div>
+        <strong>Hotline</strong>
+        <a href="tel:+254700000000">+254 700 000 000</a>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon">📍</div>
+        <strong>Office</strong>
+        <a href="#">Nairobi, Kenya</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo">🩸 DamuConnect</div>
+    <p>© 2025 DamuConnect Kenya</p>
+    <p>Saving lives, one drop at a time</p>
+  </footer>
+</body>
+</html>
